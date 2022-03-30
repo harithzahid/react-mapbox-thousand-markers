@@ -34,6 +34,27 @@ export const getMapMarkers = (state = initialState, action) => {
   }
 };
 
+export const selectUser = (state = initialState, action) => {
+  switch (action.type) {
+    case 'SELECT_USER':
+      return {
+        status: REQUEST_STATUS.SUCCEEDED,
+        data: [action.payload.data]
+      }
+    case 'CLEAR_SELECTED_USER':
+      return {
+        status: REQUEST_STATUS.SUCCEEDED,
+        data: []
+      }
+    default:
+      return state;
+  }
+}
+
+export const getSelectedUser = (state) => {
+  return state.selectUser.data[0];
+}
+
 export const getMapMarkersRequestStatus = (state) => {
   return state.getMapMarkers.status;
 };

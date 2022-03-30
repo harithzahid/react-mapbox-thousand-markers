@@ -4,7 +4,7 @@ import { Map as MapGL, useMap, Marker } from 'react-map-gl';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { getMapMarkers } from 'src/actions/map';
-import { getMapMarkersData } from 'src/reducers/map';
+import { getMapMarkersData, getSelectedUser } from 'src/reducers/map';
 
 import Pin from './Pin.jsx';
 
@@ -13,6 +13,7 @@ const TOKEN = process.env.REACT_APP_MAPBOX_PUBLIC_TOKEN;
 const Map = () => {
   const dispatch = useDispatch();
   const mapMarkersData = useSelector(getMapMarkersData);
+  const selectedUser = useSelector(getSelectedUser);
   const mapRef = useRef();
 
   const getBounds = () => {
@@ -34,19 +35,32 @@ const Map = () => {
     dispatch(getMapMarkers(boundsCoords));
   }
 
+  const onClickMarker = (id) => {
+    dispatch({
+      type: 'SELECT_USER',
+      payload: {
+        data: mapMarkersData.find((item) => item.id === id)
+      }
+    })
+  }
+
   const pins = useMemo(
     () =>
-      mapMarkersData.map((coord, index) => (
+      mapMarkersData.map((item, index) => (
         <Marker
-          key={`marker-${index}`}
-          longitude={coord[0]}
-          latitude={coord[1]}
+          key={`marker-${item.id}`}
+          longitude={item.contractorInfo.coordinates[0]}
+          latitude={item.contractorInfo.coordinates[1]}
           anchor="bottom"
         >
-          <Pin />
+          <Pin
+            pinStyle={{ fill: selectedUser?.id === item.id ? 'green' : 'red' }}
+            size={selectedUser?.id === item.id ? 25 : 20}
+            onClick={() => { onClickMarker(item.id) }}
+          />
         </Marker>
       )),
-    [mapMarkersData]
+    [mapMarkersData, selectedUser]
   );
 
   return (

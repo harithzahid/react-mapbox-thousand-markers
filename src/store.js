@@ -2,10 +2,14 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 
-import { getMapMarkers } from 'src/reducers/map';
+import {
+  getMapMarkers,
+  selectUser
+} from 'src/reducers/map';
 
 const reducer = combineReducers({
-  getMapMarkers
+  getMapMarkers,
+  selectUser
 });
 
 const initialState = {};
