@@ -4,7 +4,7 @@ import { Map as MapGL, useMap, Marker } from 'react-map-gl';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { getMapMarkers } from 'src/actions/map';
-import { getMapMarkersData, getSelectedUser } from 'src/reducers/map';
+import { getMapMarkerList, getSelectedUser, getMapMarkerType } from 'src/reducers/map';
 
 import Pin from './Pin.jsx';
 
@@ -12,7 +12,8 @@ const TOKEN = process.env.REACT_APP_MAPBOX_PUBLIC_TOKEN;
 
 const Map = () => {
   const dispatch = useDispatch();
-  const mapMarkersData = useSelector(getMapMarkersData);
+  const mapMarkerList = useSelector(getMapMarkerList);
+  const mapMarkerType = useSelector(getMapMarkerType);
   const selectedUser = useSelector(getSelectedUser);
   const mapRef = useRef();
 
@@ -22,31 +23,40 @@ const Map = () => {
 
   const onMapLoad = () => {
     const boundsCoords = getBounds();
-    dispatch(getMapMarkers(boundsCoords))
+    dispatch(getMapMarkers({
+      coords: boundsCoords,
+      user: 'contractor'
+    }))
   }
 
   const onMapDragEnd = () => {
     const boundsCoords = getBounds();
-    dispatch(getMapMarkers(boundsCoords));
+    dispatch(getMapMarkers({
+      coords: boundsCoords,
+      user: mapMarkerType
+    }))
   }
 
   const onMapZoomEnd = () => {
     const boundsCoords = getBounds();
-    dispatch(getMapMarkers(boundsCoords));
+    dispatch(getMapMarkers({
+      coords: boundsCoords,
+      user: mapMarkerType
+    }))
   }
 
   const onClickMarker = (id) => {
     dispatch({
       type: 'SELECT_USER',
       payload: {
-        data: mapMarkersData.find((item) => item.id === id)
+        data: mapMarkerList.find((item) => item.id === id)
       }
     })
   }
 
   const pins = useMemo(
     () =>
-      mapMarkersData.map((item, index) => (
+      mapMarkerList.map((item, index) => (
         <Marker
           key={`marker-${item.id}`}
           longitude={item.contractorInfo.coordinates[0]}
@@ -60,12 +70,13 @@ const Map = () => {
           />
         </Marker>
       )),
-    [mapMarkersData, selectedUser]
+    [mapMarkerList, selectedUser]
   );
 
   return (
     <div>
       <MapGL
+        id="mainMap"
         ref={mapRef}
         onLoad={onMapLoad}
         initialViewState={{
