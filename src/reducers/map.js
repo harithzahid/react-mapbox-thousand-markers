@@ -18,7 +18,7 @@ export const getMapMarkers = (state = initialState, action) => {
         status: REQUEST_STATUS.LOADING,
         data: {
           type: action.payload.type,
-          list: state.data.list
+          list: action.payload.type === state.data.type ? state.data.list : []
         }
       };
     case 'GET_MAP_MARKERS_SUCCESS':

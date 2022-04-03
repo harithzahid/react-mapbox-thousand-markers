@@ -6,7 +6,7 @@ export const getMapMarkers = ({ coords, user }, callback) => async (dispatch) =>
       type: 'GET_MAP_MARKERS_LOADING',
       payload: {
         data: {
-          type: user
+          type: user,
         }
       }
     });

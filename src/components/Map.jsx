@@ -59,8 +59,8 @@ const Map = () => {
       mapMarkerList.map((item, index) => (
         <Marker
           key={`marker-${item.id}`}
-          longitude={item.contractorInfo.coordinates[0]}
-          latitude={item.contractorInfo.coordinates[1]}
+          longitude={item[mapMarkerType === 'owner' ? 'projectInfo' : 'contractorInfo'].coordinates[0]}
+          latitude={item[mapMarkerType === 'owner' ? 'projectInfo' : 'contractorInfo'].coordinates[1]}
           anchor="bottom"
         >
           <Pin
