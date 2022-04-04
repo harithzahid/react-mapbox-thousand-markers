@@ -12,7 +12,7 @@ import ProjectItemList from './ProjectItemList.jsx';
 import ProjectCard from './ProjectCard.jsx';
 
 import { REQUEST_STATUS } from 'src/store';
-import { getUsers, getSelectedUser, getMapMarkerType, getSelectUserStatus } from 'src/reducers/map';
+import { getUsers, getSelectedUser, getMapMarkerType, getSelectUserStatus, getBounds } from 'src/reducers/map';
 import { getPaginationInfo } from 'src/store';
 import { getMapMarkers, initalizePage } from 'src/actions/map';
 import { getUsersActions, getUserActions } from 'src/actions/user';
@@ -61,6 +61,7 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const { mainMap } = useMap();
   const users = useSelector(getUsers);
+  const currentBounds = useSelector(getBounds);
   const selectedUser = useSelector(getSelectedUser);
   const mapMarkerType = useSelector(getMapMarkerType);
   const paginationInfo = useSelector(getPaginationInfo);
@@ -113,9 +114,8 @@ const Sidebar = () => {
           <Pagination
             sx={{ display: 'flex', margin: '10px', justifyContent: 'center' }}
             onChange={(e, page) => {
-              const boundsCoords = mainMap.getBounds().toArray();
               dispatch(getUsersActions({
-                coords: boundsCoords,
+                coords: currentBounds,
                 user: mapMarkerType,
                 page
               }))

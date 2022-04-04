@@ -18,7 +18,6 @@ const Map = () => {
   const mapMarkerType = useSelector(getMapMarkerType);
   const selectedUser = useSelector(getSelectedUser);
   const mapRef = useRef();
-  console.log();
 
   const getBounds = () => {
     return mapRef.current.getBounds().toArray();
@@ -31,12 +30,12 @@ const Map = () => {
 
   const onMapDragEnd = () => {
     const boundsCoords = getBounds();
-    dispatch(initalizePage(boundsCoords, mapMarkerType));
+    dispatch(initalizePage(boundsCoords, mapMarkerType, 1000));
   }
 
   const onMapZoomEnd = () => {
     const boundsCoords = getBounds();
-    dispatch(initalizePage(boundsCoords, mapMarkerType));
+    dispatch(initalizePage(boundsCoords, mapMarkerType, 1000));
   }
 
   const onClickMarker = (id) => {
@@ -71,7 +70,7 @@ const Map = () => {
         initialViewState={{
           latitude: 40,
           longitude: -100,
-          zoom: 3.6,
+          zoom: 6,
           bearing: 0,
           pitch: 0,
         }}

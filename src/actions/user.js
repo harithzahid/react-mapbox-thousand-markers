@@ -1,6 +1,7 @@
 import axios from 'axios';
+import _ from 'lodash';
 
-export const getUsersActions = ({ coords, user, page }, callback) => async (dispatch) => {
+export const getUsersActions = ({ coords, user, page }, callback) => async (dispatch, getState) => {
   try {
     dispatch({
       type: 'GET_NEXT_USERS_LOADING',
@@ -20,15 +21,19 @@ export const getUsersActions = ({ coords, user, page }, callback) => async (disp
 
     const sw = coords[0];
     const ne = coords[1];
-    console.log({ sw, ne });
     const endpoint = `/api/user/list?user=${user}&sw=${sw}&ne=${ne}&page=${page}`;
     const { data } = await axios.get(endpoint, config);
+    const dataStore = getState();
+    const currentUsersData = _.get(dataStore,'getUsersReducer.data.users',[]);
+    const currentSw = _.get(dataStore,'mapReducer.data.sw');
+    const currentNe = _.get(dataStore,'mapReducer.data.ne');
+    const isResponseSyncWithMap = currentSw === sw && currentNe === ne;
 
     dispatch({
       type: 'GET_NEXT_USERS_SUCCESS',
       payload: {
         type: user,
-        users: data
+        users: isResponseSyncWithMap ? data : currentUsersData
       },
     });
 

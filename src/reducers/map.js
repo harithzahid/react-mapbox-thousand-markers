@@ -11,6 +11,21 @@ const initialState = {
   data: {},
 };
 
+export const mapReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case 'INITIALIZE':
+      return {
+        data: {
+          ...state.data,
+          sw: action.payload.sw,
+          ne: action.payload.ne
+        }
+      };
+    default:
+      return state;
+  }
+}
+
 export const getMapMarkers = (state = initialState, action) => {
   switch (action.type) {
     case 'GET_MAP_MARKERS_LOADING':
@@ -33,6 +48,14 @@ export const getMapMarkers = (state = initialState, action) => {
         error: action.payload,
         data: state.data
       };
+    case 'INITIALIZE':
+      return {
+        status: REQUEST_STATUS.IDLE,
+        data: {
+          timeout: action.payload.timeout,
+          markers: state.data.markers || []
+        }
+      }
     default:
       return state;
   }
@@ -40,6 +63,13 @@ export const getMapMarkers = (state = initialState, action) => {
 
 export const getUsersReducer = (state = initialState, action) => {
   switch (action.type) {
+    // case 'GET_MAP_MARKERS_LOADING':
+    //   return {
+    //     status: REQUEST_STATUS.IDLE,
+    //     data: {
+    //       type: action.payload.type,
+    //     }
+    //   };
     case 'GET_NEXT_USERS_LOADING':
       let users = {}
       if (action.payload.type === state.data.type) {
@@ -96,6 +126,10 @@ export const selectUser = (state = initialState, action) => {
     default:
       return state;
   }
+}
+
+export const getBounds = (state) => {
+  return [state.mapReducer.data.sw, state.mapReducer.data.ne];
 }
 
 export const getSelectUserStatus = (state) => {

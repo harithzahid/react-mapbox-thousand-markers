@@ -3,6 +3,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 
 import {
+  mapReducer,
   getMapMarkers,
   selectUser,
   getUsersReducer
@@ -11,7 +12,8 @@ import {
 const reducer = combineReducers({
   getMapMarkers,
   selectUser,
-  getUsersReducer
+  getUsersReducer,
+  mapReducer
 });
 
 const middleware = [thunk];

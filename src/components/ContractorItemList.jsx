@@ -15,6 +15,7 @@ const ContractorItemList = ({ list, onClick }) => list.map((item) => {
   const address = _.get(item, 'contractorInfo.address') || {};
   return (
     <div
+      key={item.id}
       style={{
         margin: 10,
         display: 'flex',

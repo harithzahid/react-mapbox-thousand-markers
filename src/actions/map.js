@@ -3,31 +3,44 @@ import _ from 'lodash';
 
 import { getUsersActions } from 'src/actions/user';
 
-export const initalizePage = (coords, userType='contractor') => async (dispatch, getState) => {
-  await dispatch(
-    getMapMarkers({
-      coords,
-      user: userType
-    })
-  );
-
+export const initalizePage = (coords, userType='contractor', debounce=0) => async (dispatch, getState) => {
   const dataStore = getState();
-  const markers = _.get(
+
+  const fetch = async () => {
+    dispatch(
+      getMapMarkers({
+        coords,
+        user: userType
+      })
+    );
+
+    dispatch(
+      getUsersActions({
+        coords,
+        user: userType,
+        page: 1
+      })
+    )
+  }
+
+  const currentTimeout = _.get(
     dataStore,
-    'getMapMarkers.data.markers',
+    'getMapMarkers.data.timeout',
     []
   );
-
-  markers.length > 0 && dispatch(
-    getUsersActions({
-      coords,
-      user: userType,
-      page: 1
-    })
-  )
+  clearTimeout(currentTimeout);
+  const timeout = setTimeout(fetch, debounce);
+  dispatch({
+    type: 'INITIALIZE',
+    payload: {
+      timeout,
+      sw: coords[0],
+      ne: coords[1]
+    }
+  })
 }
 
-export const getMapMarkers = ({ coords, user, page }, callback) => async (dispatch) => {
+export const getMapMarkers = ({ coords, user, page }, callback) => async (dispatch, getState) => {
   try {
     dispatch({
       type: 'GET_MAP_MARKERS_LOADING',
@@ -46,11 +59,16 @@ export const getMapMarkers = ({ coords, user, page }, callback) => async (dispat
     const ne = coords[1];
     const endpoint = `/api/map?user=${user}&sw=${sw}&ne=${ne}&type=${user}`;
     const { data } = await axios.get(endpoint, config);
+    const dataStore = getState();
+    const currentMarkersData = _.get(dataStore,'getMapMarkers.data.markers',[]);
+    const currentSw = _.get(dataStore,'mapReducer.data.sw');
+    const currentNe = _.get(dataStore,'mapReducer.data.ne');
+    const isResponseSyncWithMap = currentSw === sw && currentNe === ne;
 
     dispatch({
       type: 'GET_MAP_MARKERS_SUCCESS',
       payload: {
-        markers: data
+        markers: isResponseSyncWithMap ? data : currentMarkersData
       }
     });
 
