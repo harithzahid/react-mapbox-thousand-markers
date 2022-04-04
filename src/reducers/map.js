@@ -63,13 +63,6 @@ export const getMapMarkers = (state = initialState, action) => {
 
 export const getUsersReducer = (state = initialState, action) => {
   switch (action.type) {
-    // case 'GET_MAP_MARKERS_LOADING':
-    //   return {
-    //     status: REQUEST_STATUS.IDLE,
-    //     data: {
-    //       type: action.payload.type,
-    //     }
-    //   };
     case 'GET_NEXT_USERS_LOADING':
       let users = {}
       if (action.payload.type === state.data.type) {
@@ -126,6 +119,10 @@ export const selectUser = (state = initialState, action) => {
     default:
       return state;
   }
+}
+
+export const getUsersStatus = (state) => {
+  return state.getUsersReducer.status;
 }
 
 export const getBounds = (state) => {

@@ -2,13 +2,30 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useState } from 'react';
 import { useMap } from 'react-map-gl';
 import _ from 'lodash';
+import LinearProgress from '@mui/material/LinearProgress';
+import Box from '@mui/material/Box';
 
 import UserSwitch from './SidebarUserSwitch.jsx';
 
 import { getMapMarkerList, getSelectedUser } from 'src/reducers/map';
 import { getMapMarkers } from 'src/actions/map';
 
-const defaultProfileImage = "/images/rayul-profile-image.jpg"
+const defaultProfileImage = "/images/rayul-profile-image.jpg";
+
+const ItemList = ({ isLoading, ...rest }) => {
+
+  return (
+    <div>
+      {
+        isLoading &&
+        <Box sx={{ padding: '10px', margin: '5px' }}>
+          <LinearProgress />
+        </Box>
+      }
+      <ContractorItemList {...rest} />
+    </div>
+  )
+}
 
 const ContractorItemList = ({ list, onClick }) => list.map((item) => {
 
@@ -50,4 +67,4 @@ const ContractorItemList = ({ list, onClick }) => list.map((item) => {
   )
 });
 
-export default ContractorItemList;
+export default ItemList;

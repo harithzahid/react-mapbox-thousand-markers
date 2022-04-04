@@ -12,7 +12,14 @@ import ProjectItemList from './ProjectItemList.jsx';
 import ProjectCard from './ProjectCard.jsx';
 
 import { REQUEST_STATUS } from 'src/store';
-import { getUsers, getSelectedUser, getMapMarkerType, getSelectUserStatus, getBounds } from 'src/reducers/map';
+import {
+  getUsers,
+  getSelectedUser,
+  getMapMarkerType,
+  getSelectUserStatus,
+  getBounds,
+  getUsersStatus
+} from 'src/reducers/map';
 import { getPaginationInfo } from 'src/store';
 import { getMapMarkers, initalizePage } from 'src/actions/map';
 import { getUsersActions, getUserActions } from 'src/actions/user';
@@ -20,6 +27,7 @@ import { getUsersActions, getUserActions } from 'src/actions/user';
 const defaultProfileImage = "/images/rayul-profile-image.jpg";
 
 const ContractorSidebarItem = ({ onCloseUserCard, onClickSummaryUserCard }) => {
+  const usersStatus = useSelector(getUsersStatus);
   const selectUserStatus = useSelector(getSelectUserStatus);
   const selectedUser = useSelector(getSelectedUser);
   const users = useSelector(getUsers);
@@ -34,11 +42,13 @@ const ContractorSidebarItem = ({ onCloseUserCard, onClickSummaryUserCard }) => {
       : <ContractorItemList
           list={users}
           onClick={onClickSummaryUserCard}
+          isLoading={usersStatus !== REQUEST_STATUS.SUCCEEDED}
         />
   )
 }
 
 const ProjectSidebarItem = ({ onCloseUserCard, onClickSummaryUserCard }) => {
+  const usersStatus = useSelector(getUsersStatus);
   const selectUserStatus = useSelector(getSelectUserStatus);
   const selectedUser = useSelector(getSelectedUser);
   const users = useSelector(getUsers);
@@ -53,6 +63,7 @@ const ProjectSidebarItem = ({ onCloseUserCard, onClickSummaryUserCard }) => {
       : <ProjectItemList
           list={users}
           onClick={onClickSummaryUserCard}
+          isLoading={usersStatus !== REQUEST_STATUS.SUCCEEDED}
         />
   )
 }

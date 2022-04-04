@@ -28,12 +28,15 @@ export const getUsersActions = ({ coords, user, page }, callback) => async (disp
     const currentSw = _.get(dataStore,'mapReducer.data.sw');
     const currentNe = _.get(dataStore,'mapReducer.data.ne');
     const isResponseSyncWithMap = currentSw === sw && currentNe === ne;
+    if (!isResponseSyncWithMap) {
+      throw new Error("Response not sync with map bounds.");
+    }
 
     dispatch({
       type: 'GET_NEXT_USERS_SUCCESS',
       payload: {
         type: user,
-        users: isResponseSyncWithMap ? data : currentUsersData
+        users: data
       },
     });
 

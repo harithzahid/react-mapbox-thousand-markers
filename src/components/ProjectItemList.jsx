@@ -4,6 +4,8 @@ import { useMap } from 'react-map-gl';
 import _ from 'lodash';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
+import LinearProgress from '@mui/material/LinearProgress';
+import Box from '@mui/material/Box';
 
 import UserSwitch from './SidebarUserSwitch.jsx';
 
@@ -15,6 +17,22 @@ const formatDate = (date) => {
   const dateFormat = dayjs.extend(advancedFormat);
   return dateFormat(date).format('MMMM Do, YYYY');
 };
+
+
+const ItemList = ({ isLoading, ...rest }) => {
+
+  return (
+    <div>
+      {
+        isLoading &&
+        <Box sx={{ padding: '10px', margin: '5px' }}>
+          <LinearProgress />
+        </Box>
+      }
+      <ProjectItemList {...rest} />
+    </div>
+  )
+}
 
 const ProjectItemList = ({ list, onClick }) => list.map((item) => {
   const address = _.get(item, 'projectInfo.address') || {};
@@ -65,4 +83,4 @@ const ProjectItemList = ({ list, onClick }) => list.map((item) => {
   )
 });
 
-export default ProjectItemList;
+export default ItemList;

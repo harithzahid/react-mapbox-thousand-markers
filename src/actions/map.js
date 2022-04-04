@@ -64,11 +64,14 @@ export const getMapMarkers = ({ coords, user, page }, callback) => async (dispat
     const currentSw = _.get(dataStore,'mapReducer.data.sw');
     const currentNe = _.get(dataStore,'mapReducer.data.ne');
     const isResponseSyncWithMap = currentSw === sw && currentNe === ne;
+    if (!isResponseSyncWithMap) {
+      throw new Error("Response not sync with map bounds.");
+    }
 
     dispatch({
       type: 'GET_MAP_MARKERS_SUCCESS',
       payload: {
-        markers: isResponseSyncWithMap ? data : currentMarkersData
+        markers: data
       }
     });
 
