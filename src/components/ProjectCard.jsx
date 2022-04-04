@@ -11,23 +11,28 @@ import ContractorItemList from './ContractorItemList.jsx';
 import { getMapMarkerList, getSelectedUser } from 'src/reducers/map';
 import { getMapMarkers } from 'src/actions/map';
 
-const data = {
-  projectInfo: {
-    title: 'Need helps moving stuff.',
-    address: {
-      state: 'New York',
-      country: 'US'
-    },
-  }
-}
-
-const ContractorCard = ({ item=data, onClose }) => {
+const Card = ({ item, onClose }) => {
   const address = item.projectInfo.address;
   const fullAddress = Object.keys(address).reduce((total, current) => {
     if (address[current]) {
       return total.length > 0 ? address[current] + ',' + ' ' + total : address[current]
     }
   }, '');
+
+  return (
+    <>
+      <h3>{item.projectInfo.title}</h3>
+      <div style={{ fontSize: 13 }}>{fullAddress}</div>
+      <p>{item.projectInfo.description}</p>
+      <div>Budget: ${item.projectInfo.budget}</div>
+      <div>Start date: {formatDate(item.projectInfo.startDate)}</div>
+    </>
+  )
+}
+
+
+const ContractorCard = (props) => {
+  const { onClose, isLoading, ...rest } = props;
 
   return (
     <div
@@ -41,11 +46,9 @@ const ContractorCard = ({ item=data, onClose }) => {
       }}
     >
       <div onClick={onClose} style={{ fontSize: 14, fontWeight: 'bold' }}>{'< Back'}</div>
-      <h3>{item.projectInfo.title}</h3>
-      <div style={{ fontSize: 13 }}>{fullAddress}</div>
-      <p>{item.projectInfo.description}</p>
-      <div>Budget: ${item.projectInfo.budget}</div>
-      <div>Start date: {formatDate(item.projectInfo.startDate)}</div>
+      {
+        !isLoading && <Card {...rest} />
+      }
     </div>
   )
 }

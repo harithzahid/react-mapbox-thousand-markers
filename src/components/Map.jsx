@@ -3,8 +3,10 @@ import {render} from 'react-dom';
 import { Map as MapGL, useMap, Marker } from 'react-map-gl';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { getMapMarkers } from 'src/actions/map';
+import { getMapMarkers, initalizePage } from 'src/actions/map';
+import { getUsersActions } from 'src/actions/user';
 import { getMapMarkerList, getSelectedUser, getMapMarkerType } from 'src/reducers/map';
+import { getUserActions } from 'src/actions/user';
 
 import Pin from './Pin.jsx';
 
@@ -16,6 +18,7 @@ const Map = () => {
   const mapMarkerType = useSelector(getMapMarkerType);
   const selectedUser = useSelector(getSelectedUser);
   const mapRef = useRef();
+  console.log();
 
   const getBounds = () => {
     return mapRef.current.getBounds().toArray();
@@ -23,35 +26,21 @@ const Map = () => {
 
   const onMapLoad = () => {
     const boundsCoords = getBounds();
-    dispatch(getMapMarkers({
-      coords: boundsCoords,
-      user: 'contractor'
-    }))
+    dispatch(initalizePage(boundsCoords));
   }
 
   const onMapDragEnd = () => {
     const boundsCoords = getBounds();
-    dispatch(getMapMarkers({
-      coords: boundsCoords,
-      user: mapMarkerType
-    }))
+    dispatch(initalizePage(boundsCoords, mapMarkerType));
   }
 
   const onMapZoomEnd = () => {
     const boundsCoords = getBounds();
-    dispatch(getMapMarkers({
-      coords: boundsCoords,
-      user: mapMarkerType
-    }))
+    dispatch(initalizePage(boundsCoords, mapMarkerType));
   }
 
   const onClickMarker = (id) => {
-    dispatch({
-      type: 'SELECT_USER',
-      payload: {
-        data: mapMarkerList.find((item) => item.id === id)
-      }
-    })
+    dispatch(getUserActions(id));
   }
 
   const pins = useMemo(
@@ -59,8 +48,8 @@ const Map = () => {
       mapMarkerList.map((item, index) => (
         <Marker
           key={`marker-${item.id}`}
-          longitude={item[mapMarkerType === 'owner' ? 'projectInfo' : 'contractorInfo'].coordinates[0]}
-          latitude={item[mapMarkerType === 'owner' ? 'projectInfo' : 'contractorInfo'].coordinates[1]}
+          longitude={item.coordinates[0]}
+          latitude={item.coordinates[1]}
           anchor="bottom"
         >
           <Pin

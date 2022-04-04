@@ -22,6 +22,7 @@ const ProjectItemList = ({ list, onClick }) => list.map((item) => {
 
   return (
     <div
+      key={item.id}
       style={{
         margin: 10,
         display: 'flex',
