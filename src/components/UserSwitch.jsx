@@ -54,6 +54,33 @@ const SwitchThumb = styled('span')`
   }
 `;
 
+const SwitchThumbContent = styled('div')({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+  color: 'white'
+})
+
+
+const SwitchTrack = styled('div')(props => ({
+  borderRadius: '10px',
+  padding: '5px',
+  height: '100%',
+  display: 'block',
+  boxShadow: 'rgb(0 0 0 / 20%) 0px 2px 1px -1px, rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px',
+  transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+  backgroundColor: 'white',
+  '&:before, &:after': {
+    position: 'absolute',
+    top: '40%',
+  },
+  '&:before': {
+    content: props.checked ? '"Projects"' : '"Contractors"',
+    [props.checked ? 'left' : 'right']: 50,
+  },
+}));
+
 function MUISwitch(props) {
   const { getInputProps, checked, disabled, focusVisible} = useSwitch(props);
 
@@ -63,34 +90,19 @@ function MUISwitch(props) {
     focusVisible
   };
 
-  const SwitchTrack = styled('span')(({ theme }) => ({
-    borderRadius: '10px',
-    padding: '5px',
-    height: '100%',
-    display: 'block',
-    boxShadow: 'rgb(0 0 0 / 20%) 0px 2px 1px -1px, rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px',
-    transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-    backgroundColor: 'white',
-    '&:before, &:after': {
-      position: 'absolute',
-      top: '40%',
-    },
-    '&:before': {
-      content: checked ? '"Projects"' : '"Contractors"',
-      [checked ? 'left' : 'right']: 50,
-    },
-  }));
-
   return (
     <SwitchRoot className={clsx(stateClasses)}>
-      <SwitchTrack>
+      <SwitchTrack checked={checked}>
         <SwitchThumb className={clsx(stateClasses)}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'white' }}>
+          <SwitchThumbContent>
             {checked ? 'Contractors' : 'Projects'}
-          </div>
+          </SwitchThumbContent>
         </SwitchThumb>
       </SwitchTrack>
-      <SwitchInput {...getInputProps()} aria-label="Demo switch" />
+      <SwitchInput
+        {...getInputProps()}
+        aria-label="Switch"
+      />
     </SwitchRoot>
   );
 }

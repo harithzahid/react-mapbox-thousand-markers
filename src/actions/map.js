@@ -5,8 +5,10 @@ import { getUsersActions } from 'src/actions/user';
 
 export const initalizePage = (coords, userType='contractor', debounce=0) => async (dispatch, getState) => {
   const dataStore = getState();
+  const currentTimeout = _.get(dataStore,'getMapMarkers.data.timeout',[]);
+  clearTimeout(currentTimeout);
 
-  const fetch = async () => {
+  const actions = () => {
     dispatch(
       getMapMarkers({
         coords,
@@ -23,17 +25,10 @@ export const initalizePage = (coords, userType='contractor', debounce=0) => asyn
     )
   }
 
-  const currentTimeout = _.get(
-    dataStore,
-    'getMapMarkers.data.timeout',
-    []
-  );
-  clearTimeout(currentTimeout);
-  const timeout = setTimeout(fetch, debounce);
   dispatch({
     type: 'INITIALIZE',
     payload: {
-      timeout,
+      timeout: setTimeout(actions, debounce),
       sw: coords[0],
       ne: coords[1]
     }

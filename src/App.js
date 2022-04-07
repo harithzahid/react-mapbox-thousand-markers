@@ -1,21 +1,14 @@
 import './App.css';
-import { MapProvider } from 'react-map-gl';
 
-import Map from 'src/components/Map.jsx';
-import Sidebar from 'src/components/Sidebar.jsx';
+import Map from 'src/pages/home/Map.jsx';
+import Sidebar from 'src/pages/home/Sidebar.jsx';
 
 function App() {
   return (
-    <MapProvider>
-      <div className="App">
-        <div style={{ minWidth: 400, backgroundColor: '#EDF2F5' }}>
-          <Sidebar />
-        </div>
-        <div style={{ width: '100%' }}>
-          <Map />
-        </div>
-      </div>
-    </MapProvider>
+    <div className="App">
+      <Sidebar />
+      <Map />
+    </div>
   );
 }
 

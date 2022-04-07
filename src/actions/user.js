@@ -23,6 +23,7 @@ export const getUsersActions = ({ coords, user, page }, callback) => async (disp
     const ne = coords[1];
     const endpoint = `/api/user/list?user=${user}&sw=${sw}&ne=${ne}&page=${page}`;
     const { data } = await axios.get(endpoint, config);
+    
     const dataStore = getState();
     const currentUsersData = _.get(dataStore,'getUsersReducer.data.users',[]);
     const currentSw = _.get(dataStore,'mapReducer.data.sw');
