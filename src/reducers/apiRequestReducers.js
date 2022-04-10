@@ -9,7 +9,8 @@ import {
   FETCH_USERS_LOADING,
   FETCH_USERS_SUCCESS,
   FETCH_USERS_ERROR,
-  FETCH_USER_CLEANUP
+  FETCH_USER_CLEANUP,
+  UPDATE_VIEWPORT
 } from 'src/constants';
 
 const initialState = {
@@ -74,6 +75,12 @@ export const fetchUsersReducer = (state = initialState, action) => {
       return {
         status: REQUEST_STATUS.FAILED,
         error: action.payload,
+        data: state.data
+      };
+    case UPDATE_VIEWPORT:
+      return {
+        status: REQUEST_STATUS.IDLE,
+        error: state.error,
         data: state.data
       };
     default:

@@ -31,12 +31,12 @@ import UserCardContainer from './UserCardContainer.jsx';
 
 const SidebarUserItem = ({ onCloseCard, onClickListCard }) => {
   const markerType = useSelector(selectMapMarkerType);
-  const usersStatus = useSelector(selectUsersStatus);
-  const userStatus = useSelector(selectUserStatus);
+  const fetchUsersStatus = useSelector(selectUsersStatus);
+  const fetchUserStatus = useSelector(selectUserStatus);
   const user = useSelector(selectUser);
   const users = useSelector(selectUsers);
-  const isListLoading = usersStatus !== REQUEST_STATUS.SUCCEEDED;
-  const isUserLoading = userStatus !== REQUEST_STATUS.SUCCEEDED;
+  const isListLoading = fetchUsersStatus !== REQUEST_STATUS.SUCCEEDED;
+  const isUserLoading = fetchUserStatus !== REQUEST_STATUS.SUCCEEDED;
   const isContractorSelected = markerType === USER_TYPE.CONTRACTOR;
 
   if (user) {
