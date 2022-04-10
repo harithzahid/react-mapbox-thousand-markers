@@ -32,7 +32,6 @@ const ContractorCardBig = ({ item, onClose }) => {
   const phoneNoText = _.get(item, 'contractorInfo.contact_number');
   const introText = _.get(item, 'contractorInfo.intro');
   const skills = _.get(item, 'contractorInfo.skills') || [];
-
   const addressText = objectToString(address, ', ');
 
   return (

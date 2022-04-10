@@ -56,10 +56,7 @@ const ContractorCardSmall = ({ item, onClick }) =>  {
   const skills = _.get(item, 'contractorInfo.skills') || [];
 
   return (
-    <Root
-      key={item.id}
-      onClick={() => { onClick(item.id) }}
-    >
+    <Root onClick={() => { onClick(item.id) }}>
       <ProfilePicture src={profilePictureUrl} />
       <DetailsContainer>
         <Name>

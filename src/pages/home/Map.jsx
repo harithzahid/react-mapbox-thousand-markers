@@ -3,9 +3,10 @@ import {render} from 'react-dom';
 import { Map as MapGL, useMap, Marker } from 'react-map-gl';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { getMapMarkers, initalizePage } from 'src/actions/map';
-import { getMapMarkerList, getSelectedUser, getMapMarkerType } from 'src/reducers/map';
-import { getUsersActions, getUserActions } from 'src/actions/user';
+import { fetchMapMarkers, updateViewportActions } from 'src/actions/map';
+import { fetchUsers, fetchUser } from 'src/actions/user';
+import { selectMapMarkers, selectUser, selectMapMarkerType } from 'src/store';
+import { USER_TYPE } from 'src/constants';
 
 import Pin from 'src/components/Pin.jsx';
 
@@ -14,9 +15,9 @@ const MAP_STYLE = "mapbox://styles/mapbox/dark-v9";
 
 const Map = () => {
   const dispatch = useDispatch();
-  const mapMarkerList = useSelector(getMapMarkerList);
-  const mapMarkerType = useSelector(getMapMarkerType);
-  const selectedUser = useSelector(getSelectedUser);
+  const markers = useSelector(selectMapMarkers);
+  const markerType = useSelector(selectMapMarkerType);
+  const user = useSelector(selectUser);
   const mapRef = useRef();
 
   const getBounds = () => {
@@ -24,36 +25,48 @@ const Map = () => {
   }
 
   const onMapLoad = () => {
-    const boundsCoords = getBounds();
-    dispatch(initalizePage(boundsCoords));
+    const bounds = getBounds();
+    dispatch(updateViewportActions(
+      bounds,
+      USER_TYPE.CONTRACTOR
+    ));
   }
 
   const onMapDragEnd = () => {
-    const boundsCoords = getBounds();
-    dispatch(initalizePage(
-      boundsCoords,
-      mapMarkerType,
+    const bounds = getBounds();
+    dispatch(updateViewportActions(
+      bounds,
+      markerType,
       1000
     ));
   }
 
   const onMapZoomEnd = () => {
-    const boundsCoords = getBounds();
-    dispatch(initalizePage(
-      boundsCoords,
-      mapMarkerType,
+    const bounds = getBounds();
+    dispatch(updateViewportActions(
+      bounds,
+      markerType,
+      1000
+    ));
+  }
+
+  const onMapMoveEnd = () => {
+    const bounds = getBounds();
+    dispatch(updateViewportActions(
+      bounds,
+      markerType,
       1000
     ));
   }
 
   const onClickMarker = (id) => {
-    dispatch(getUserActions(id));
+    dispatch(fetchUser(id));
   }
 
   const pins = useMemo(
     () =>
-      mapMarkerList.map((item, index) => {
-        const isPinSelected = selectedUser?.id === item.id;
+      markers.map((item, index) => {
+        const isPinSelected = user?.id === item.id;
         return (
           <Marker
             key={`marker-${item.id}`}
@@ -69,7 +82,7 @@ const Map = () => {
           </Marker>
         )
       }),
-    [mapMarkerList, selectedUser]
+    [markers, user]
   );
 
   return (
@@ -90,6 +103,7 @@ const Map = () => {
       onLoad={onMapLoad}
       onDragEnd={onMapDragEnd}
       onZoomEnd={onMapZoomEnd}
+      onMoveEnd={onMapMoveEnd}
     >
       {pins}
     </MapGL>

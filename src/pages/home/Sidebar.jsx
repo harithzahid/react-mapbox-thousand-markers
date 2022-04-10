@@ -13,42 +13,42 @@ import ProjectCardBig from 'src/components/ProjectCardBig.jsx';
 import ContractorSmallCard from 'src/components/ContractorCardSmall.jsx';
 import UserSwitch from 'src/components/UserSwitch.jsx';
 
-import { REQUEST_STATUS } from 'src/store';
 import {
-  getUsers,
-  getSelectedUser,
-  getMapMarkerType,
-  getSelectUserStatus,
-  getBounds,
-  getUsersStatus
-} from 'src/reducers/map';
-import { getPaginationInfo } from 'src/store';
-import { getMapMarkers, initalizePage } from 'src/actions/map';
-import { getUsersActions, getUserActions } from 'src/actions/user';
+  selectUsers,
+  selectUser,
+  selectMapMarkerType,
+  selectUserStatus,
+  selectMapBounds,
+  selectUsersStatus,
+  selectPaginationInfo
+} from 'src/store';
+import { REQUEST_STATUS, USER_TYPE, FETCH_USER_CLEANUP } from 'src/constants';
+import { fetchMapMarkers } from 'src/actions/map';
+import { updateUserTypeActions, fetchUsers, fetchUser  } from 'src/actions/user';
 
 import styles from './Sidebar.module.css';
 import UserCardContainer from './UserCardContainer.jsx';
 
-const SidebarUserItem = ({ onCloseUserCard, onClickSummaryUserCard }) => {
-  const mapMarkerType = useSelector(getMapMarkerType);
-  const usersStatus = useSelector(getUsersStatus);
-  const selectUserStatus = useSelector(getSelectUserStatus);
-  const selectedUser = useSelector(getSelectedUser);
-  const users = useSelector(getUsers);
+const SidebarUserItem = ({ onCloseCard, onClickListCard }) => {
+  const markerType = useSelector(selectMapMarkerType);
+  const usersStatus = useSelector(selectUsersStatus);
+  const userStatus = useSelector(selectUserStatus);
+  const user = useSelector(selectUser);
+  const users = useSelector(selectUsers);
   const isListLoading = usersStatus !== REQUEST_STATUS.SUCCEEDED;
-  const isUserLoading = selectUserStatus !== REQUEST_STATUS.SUCCEEDED;
-  const isContractorSelected = mapMarkerType === 'contractor';
+  const isUserLoading = userStatus !== REQUEST_STATUS.SUCCEEDED;
+  const isContractorSelected = markerType === USER_TYPE.CONTRACTOR;
 
-  if (selectedUser) {
+  if (user) {
     return (
       <UserCardContainer
         isLoading={isUserLoading}
-        onClose={onCloseUserCard}
+        onClose={onCloseCard}
       >
         {
           isContractorSelected
-          ? <ContractorCardBig item={selectedUser} />
-          : <ProjectCardBig item={selectedUser} />
+          ? <ContractorCardBig item={user} />
+          : <ProjectCardBig item={user} />
         }
       </UserCardContainer>
     )
@@ -62,7 +62,7 @@ const SidebarUserItem = ({ onCloseUserCard, onClickSummaryUserCard }) => {
       }
       <ListIterator
         items={users}
-        onClick={onClickSummaryUserCard}
+        onClick={onClickListCard}
         itemRenderer={
           isContractorSelected
           ? ContractorSmallCard
@@ -74,45 +74,46 @@ const SidebarUserItem = ({ onCloseUserCard, onClickSummaryUserCard }) => {
 }
 
 const Sidebar = () => {
-  const dispatch = useDispatch();
   const { mainMap } = useMap();
-  const users = useSelector(getUsers);
-  const currentBounds = useSelector(getBounds);
-  const selectedUser = useSelector(getSelectedUser);
-  const mapMarkerType = useSelector(getMapMarkerType);
-  const paginationInfo = useSelector(getPaginationInfo);
-  const isUserSwitchChecked = mapMarkerType ? mapMarkerType === 'contractor' : true;
+  const dispatch = useDispatch();
+  const users = useSelector(selectUsers);
+  const currentBounds = useSelector(selectMapBounds);
+  const user = useSelector(selectUser);
+  const markerType = useSelector(selectMapMarkerType);
+  const paginationInfo = useSelector(selectPaginationInfo);
+  const isUserSwitchChecked = !markerType || markerType === USER_TYPE.CONTRACTOR;
   const sidebarUserItemsHeight = window.innerHeight - (paginationInfo.totalPages > 1 ? 116 : 70);
-  const showPagination = paginationInfo.totalPages > 1 && !selectedUser;
+  const showPagination = paginationInfo.totalPages > 1 && !user;
 
-  const onClickSummaryUserCard = (id) => {
-    dispatch(getUserActions(id));
+  const onClickListCard = (id) => {
+    dispatch(fetchUser(id));
   }
 
-  const onCloseUserCard = () => {
+  const onCloseCard = () => {
     dispatch({
-      type: 'CLEAR_SELECTED_USER'
+      type: FETCH_USER_CLEANUP
     })
   }
 
   const onSwitchUser = (event) => {
-    const boundsCoords = mainMap.getBounds().toArray();
-    const userType = event.target.checked ? 'contractor' : 'owner';
-    dispatch(initalizePage(boundsCoords, userType));
+    const userType = event.target.checked
+      ? USER_TYPE.CONTRACTOR
+      : USER_TYPE.OWNER;
+    dispatch(
+      updateUserTypeActions(userType)
+    );
   }
 
   const onChangePagination = (_, page) => {
-    dispatch(getUsersActions({
-      coords: currentBounds,
-      user: mapMarkerType,
-      page
-    }))
+    dispatch(
+      fetchUsers(currentBounds, markerType, page)
+    );
   }
 
   return (
     <div className={styles.root}>
       {
-        !selectedUser &&
+        !user &&
         <div className={styles.userSwitch}>
           <UserSwitch
             checked={isUserSwitchChecked}
@@ -125,8 +126,8 @@ const Sidebar = () => {
         style={{ height: sidebarUserItemsHeight }}
       >
         <SidebarUserItem
-          onCloseUserCard={onCloseUserCard}
-          onClickSummaryUserCard={onClickSummaryUserCard}
+          onCloseCard={onCloseCard}
+          onClickListCard={onClickListCard}
         />
       </div>
       {

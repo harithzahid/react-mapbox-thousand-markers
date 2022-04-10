@@ -1,10 +1,29 @@
 import axios from 'axios';
 import _ from 'lodash';
 
-export const getUsersActions = ({ coords, user, page }, callback) => async (dispatch, getState) => {
+import {
+  FETCH_USER_LOADING,
+  FETCH_USER_SUCCESS,
+  FETCH_USER_ERROR,
+  FETCH_USERS_LOADING,
+  FETCH_USERS_SUCCESS,
+  FETCH_USERS_ERROR
+} from 'src/constants';
+
+import { fetchMapMarkers } from 'src/actions/map';
+
+export const updateUserTypeActions = (userType) => async (dispatch, getState) => {
+  const dataStore = getState();
+  const currentSw = _.get(dataStore,'homepageReducer.data.boundsCoords.sw');
+  const currentNe = _.get(dataStore,'homepageReducer.data.boundsCoords.ne');
+  dispatch(fetchMapMarkers([currentSw, currentNe], userType));
+  dispatch(fetchUsers([currentSw, currentNe], userType, 1));
+}
+
+export const fetchUsers = (coords, user, page) => async (dispatch, getState) => {
   try {
     dispatch({
-      type: 'GET_NEXT_USERS_LOADING',
+      type: FETCH_USERS_LOADING,
       payload: {
         type: user,
         users: {
@@ -23,18 +42,17 @@ export const getUsersActions = ({ coords, user, page }, callback) => async (disp
     const ne = coords[1];
     const endpoint = `/api/user/list?user=${user}&sw=${sw}&ne=${ne}&page=${page}`;
     const { data } = await axios.get(endpoint, config);
-    
+
     const dataStore = getState();
-    const currentUsersData = _.get(dataStore,'getUsersReducer.data.users',[]);
-    const currentSw = _.get(dataStore,'mapReducer.data.sw');
-    const currentNe = _.get(dataStore,'mapReducer.data.ne');
+    const currentSw = _.get(dataStore,'homepageReducer.data.boundsCoords.sw');
+    const currentNe = _.get(dataStore,'homepageReducer.data.boundsCoords.ne');
     const isResponseSyncWithMap = currentSw === sw && currentNe === ne;
     if (!isResponseSyncWithMap) {
       throw new Error("Response not sync with map bounds.");
     }
 
     dispatch({
-      type: 'GET_NEXT_USERS_SUCCESS',
+      type: FETCH_USERS_SUCCESS,
       payload: {
         type: user,
         users: data
@@ -43,7 +61,7 @@ export const getUsersActions = ({ coords, user, page }, callback) => async (disp
 
   } catch (error) {
     dispatch({
-      type: 'GET_NEXT_USERS_ERROR',
+      type: FETCH_USERS_ERROR,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message
@@ -52,10 +70,10 @@ export const getUsersActions = ({ coords, user, page }, callback) => async (disp
   }
 };
 
-export const getUserActions = (id) => async (dispatch) => {
+export const fetchUser = (id) => async (dispatch) => {
   try {
     dispatch({
-      type: 'GET_USER_LOADING',
+      type: FETCH_USER_LOADING,
       payload: {
         id
       }
@@ -71,7 +89,7 @@ export const getUserActions = (id) => async (dispatch) => {
     const { data } = await axios.get(endpoint, config);
 
     dispatch({
-      type: 'GET_USER_SUCCESS',
+      type: FETCH_USER_SUCCESS,
       payload: {
         user: data
       },
@@ -79,7 +97,7 @@ export const getUserActions = (id) => async (dispatch) => {
 
   } catch (error) {
     dispatch({
-      type: 'GET_USER_ERROR',
+      type: FETCH_USER_ERROR,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message
