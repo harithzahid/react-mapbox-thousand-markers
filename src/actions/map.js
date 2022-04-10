@@ -1,49 +1,39 @@
 import axios from 'axios';
 import _ from 'lodash';
 
-import { getUsersActions } from 'src/actions/user';
+import {
+  UPDATE_VIEWPORT,
+  FETCH_MAP_MARKERS_LOADING,
+  FETCH_MAP_MARKERS_SUCCESS,
+  FETCH_MAP_MARKERS_ERROR
+} from 'src/constants';
 
-export const initalizePage = (coords, userType='contractor', debounce=0) => async (dispatch, getState) => {
+import { fetchUsers } from 'src/actions/user';
+
+export const updateViewportActions = (coords, userType, debounce=0) => async (dispatch, getState) => {
   const dataStore = getState();
+  const currentTimeout = _.get(dataStore,'homepageReducer.data.timeout',[]);
+  clearTimeout(currentTimeout);
 
-  const fetch = async () => {
-    dispatch(
-      getMapMarkers({
-        coords,
-        user: userType
-      })
-    );
-
-    dispatch(
-      getUsersActions({
-        coords,
-        user: userType,
-        page: 1
-      })
-    )
+  const actions = () => {
+    dispatch(fetchMapMarkers(coords, userType));
+    dispatch(fetchUsers(coords, userType, 1));
   }
 
-  const currentTimeout = _.get(
-    dataStore,
-    'getMapMarkers.data.timeout',
-    []
-  );
-  clearTimeout(currentTimeout);
-  const timeout = setTimeout(fetch, debounce);
   dispatch({
-    type: 'INITIALIZE',
+    type: UPDATE_VIEWPORT,
     payload: {
-      timeout,
+      timeout: setTimeout(actions, debounce),
       sw: coords[0],
       ne: coords[1]
     }
   })
 }
 
-export const getMapMarkers = ({ coords, user, page }, callback) => async (dispatch, getState) => {
+export const fetchMapMarkers = (coords, user, page) => async (dispatch, getState) => {
   try {
     dispatch({
-      type: 'GET_MAP_MARKERS_LOADING',
+      type: FETCH_MAP_MARKERS_LOADING,
       payload: {
         type: user
       }
@@ -59,17 +49,17 @@ export const getMapMarkers = ({ coords, user, page }, callback) => async (dispat
     const ne = coords[1];
     const endpoint = `/api/map?user=${user}&sw=${sw}&ne=${ne}&type=${user}`;
     const { data } = await axios.get(endpoint, config);
+
     const dataStore = getState();
-    const currentMarkersData = _.get(dataStore,'getMapMarkers.data.markers',[]);
-    const currentSw = _.get(dataStore,'mapReducer.data.sw');
-    const currentNe = _.get(dataStore,'mapReducer.data.ne');
+    const currentSw = _.get(dataStore,'homepageReducer.data.boundsCoords.sw');
+    const currentNe = _.get(dataStore,'homepageReducer.data.boundsCoords.ne');
     const isResponseSyncWithMap = currentSw === sw && currentNe === ne;
     if (!isResponseSyncWithMap) {
       throw new Error("Response not sync with map bounds.");
     }
 
     dispatch({
-      type: 'GET_MAP_MARKERS_SUCCESS',
+      type: FETCH_MAP_MARKERS_SUCCESS,
       payload: {
         markers: data
       }
@@ -77,7 +67,7 @@ export const getMapMarkers = ({ coords, user, page }, callback) => async (dispat
 
   } catch (error) {
     dispatch({
-      type: 'GET_MAP_MARKERS_ERROR',
+      type: FETCH_MAP_MARKERS_ERROR,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

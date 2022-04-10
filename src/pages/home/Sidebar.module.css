@@ -1,0 +1,35 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+  background-color: rgb(237, 242, 245);
+}
+
+.userSwitch {
+  margin: 15px 10px 10px;
+  height: 45px;
+}
+
+.sidebarUserItems {
+  overflow: auto;
+}
+
+.pagination {
+  display: flex;
+  margin: 10px;
+  justify-content: center;
+}
+
+.userCardContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: left;
+  max-width: 400px;
+}
+
+.backButton {
+  font-size: 14px;
+  font-weight: bold;
+}

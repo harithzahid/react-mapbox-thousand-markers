@@ -3,17 +3,17 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 
 import {
-  mapReducer,
-  getMapMarkers,
-  selectUser,
-  getUsersReducer
-} from 'src/reducers/map';
+  fetchMapMarkersReducer,
+  fetchUserReducer,
+  fetchUsersReducer
+} from 'src/reducers/apiRequestReducers';
+import { homepageReducer } from 'src/reducers/homePageReducers';
 
 const reducer = combineReducers({
-  getMapMarkers,
-  selectUser,
-  getUsersReducer,
-  mapReducer
+  fetchMapMarkersReducer,
+  fetchUserReducer,
+  fetchUsersReducer,
+  homepageReducer
 });
 
 const middleware = [thunk];
@@ -26,21 +26,39 @@ const store = createStore(
 
 export default store;
 
-export const REQUEST_STATUS = {
-  IDLE: 'IDLE',
-  LOADING: 'LOADING',
-  SUCCEEDED: 'SUCCEEDED',
-  FAILED: 'FAILED',
-};
-
-const initialState = {
-  status: REQUEST_STATUS.IDLE,
-  error: null,
-  data: {},
-};
-
-export const getPaginationInfo = (state) => {
-  const users = state.getUsersReducer.data.users || {};
+export const selectPaginationInfo = (state) => {
+  const users = state.fetchUsersReducer.data.users || {};
   const { docs, ...rest } = users;
   return rest || {}
 };
+
+export const selectUsersStatus = (state) => {
+  return state.fetchUsersReducer.status;
+}
+
+export const selectMapBounds = (state) => {
+  return [
+    state.homepageReducer.data.boundsCoords.sw,
+    state.homepageReducer.data.boundsCoords.ne
+  ];
+}
+
+export const selectUserStatus = (state) => {
+  return state.fetchUserReducer.status;
+}
+
+export const selectUser = (state) => {
+  return state.fetchUserReducer.data.id && state.fetchUserReducer.data;
+}
+
+export const selectMapMarkerType = (state) => {
+  return state.fetchUsersReducer.data.type
+}
+
+export const selectUsers = (state) => {
+  return state.fetchUsersReducer.data.users?.docs || [];
+}
+
+export const selectMapMarkers = (state) => {
+  return state.fetchMapMarkersReducer.data.markers || []
+}
