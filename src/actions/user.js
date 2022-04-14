@@ -40,10 +40,12 @@ export const fetchUsers = (coords, user, page) => async (dispatch, getState) => 
 
     const sw = coords[0];
     const ne = coords[1];
-    const endpoint = `/api/user/list?user=${user}&sw=${sw}&ne=${ne}&page=${page}`;
+    const endpoint = `${process.env.REACT_APP_API_ENDPOINT}/api/user/list?user=${user}&sw=${sw}&ne=${ne}&page=${page}`;
     const { data } = await axios.get(endpoint, config);
 
     const dataStore = getState();
+    const currentUsersType = _.get(dataStore,'fetchUsersReducer.data.type');
+    // TODO: Check and compare user type
     const currentSw = _.get(dataStore,'homepageReducer.data.boundsCoords.sw');
     const currentNe = _.get(dataStore,'homepageReducer.data.boundsCoords.ne');
     const isResponseSyncWithMap = currentSw === sw && currentNe === ne;
@@ -85,7 +87,7 @@ export const fetchUser = (id) => async (dispatch) => {
       },
     };
 
-    const endpoint = `/api/user?id=${id}`;
+    const endpoint = `${process.env.REACT_APP_API_ENDPOINT}/api/user?id=${id}`;
     const { data } = await axios.get(endpoint, config);
 
     dispatch({
