@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import {render} from 'react-dom';
 import { Map as MapGL, useMap, Marker } from 'react-map-gl';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,44 +24,26 @@ const Map = () => {
     return mapRef.current.getBounds().toArray();
   }
 
-  const onMapLoad = () => {
+  const onMapLoad = useCallback(() => {
     const bounds = getBounds();
     dispatch(updateViewportActions(
       bounds,
       USER_TYPE.CONTRACTOR
     ));
-  }
+  }, [getBounds])
 
-  const onMapDragEnd = () => {
+  const onMapMoveEnd = useCallback(() => {
     const bounds = getBounds();
     dispatch(updateViewportActions(
       bounds,
       markerType,
       1000
     ));
-  }
+  }, [getBounds, markerType])
 
-  const onMapZoomEnd = () => {
-    const bounds = getBounds();
-    dispatch(updateViewportActions(
-      bounds,
-      markerType,
-      1000
-    ));
-  }
-
-  const onMapMoveEnd = () => {
-    const bounds = getBounds();
-    dispatch(updateViewportActions(
-      bounds,
-      markerType,
-      1000
-    ));
-  }
-
-  const onClickMarker = (id) => {
+  const onClickMarker = useCallback((id) => {
     dispatch(fetchUser(id));
-  }
+  }, [])
 
   const pins = useMemo(
     () =>
@@ -101,8 +83,6 @@ const Map = () => {
         height: window.innerHeight
       }}
       onLoad={onMapLoad}
-      onDragEnd={onMapDragEnd}
-      onZoomEnd={onMapZoomEnd}
       onMoveEnd={onMapMoveEnd}
     >
       {pins}
