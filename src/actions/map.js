@@ -47,7 +47,7 @@ export const fetchMapMarkers = (coords, user, page) => async (dispatch, getState
 
     const sw = coords[0];
     const ne = coords[1];
-    const endpoint = `/api/map?user=${user}&sw=${sw}&ne=${ne}&type=${user}`;
+    const endpoint = `${process.env.REACT_APP_API_ENDPOINT}/api/map?user=${user}&sw=${sw}&ne=${ne}&type=${user}`;
     const { data } = await axios.get(endpoint, config);
 
     const dataStore = getState();
