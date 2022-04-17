@@ -10,6 +10,16 @@ import { USER_TYPE } from 'src/constants';
 
 import Pin from 'src/components/Pin.jsx';
 
+/**
+ * Bug fix for production build
+ * An error occurred while parsing the WebWorker bundle. This is most likely due to improper transpilation by Babel;
+ * Uncaught ReferenceError: y is not defined
+ * Reference: https://github.com/visgl/react-map-gl/issues/1266
+ */
+import mapboxgl from "mapbox-gl";
+// eslint-disable-next-line import/no-webpack-loader-syntax
+mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
+
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_PUBLIC_TOKEN;
 const MAP_STYLE = "mapbox://styles/mapbox/dark-v9";
 
