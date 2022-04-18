@@ -30,26 +30,22 @@ const Map = () => {
   const user = useSelector(selectUser);
   const mapRef = useRef();
 
-  const getBounds = () => {
-    return mapRef.current.getBounds().toArray();
-  }
-
   const onMapLoad = useCallback(() => {
-    const bounds = getBounds();
+    const bounds = mapRef.current.getBounds().toArray();
     dispatch(updateViewportActions(
       bounds,
       USER_TYPE.CONTRACTOR
     ));
-  }, [getBounds])
+  }, [])
 
   const onMapMoveEnd = useCallback(() => {
-    const bounds = getBounds();
+    const bounds = mapRef.current.getBounds().toArray();
     dispatch(updateViewportActions(
       bounds,
       markerType,
       1000
     ));
-  }, [getBounds, markerType])
+  }, [markerType])
 
   const onClickMarker = useCallback((id) => {
     dispatch(fetchUser(id));
